@@ -7,8 +7,9 @@ const amqp = require('amqplib/callback_api');
 var app = express();
 
 const textVar='amirsorouri00'
-const fileDirs = '/home/amirsorouri/Desktop/stream/amirh/node-queue/semi'; // Directory that input files are stored
-const movieLocs = '/home/amirsorouri/Desktop/stream/amirh/node-queue/semi/f2.mp4'; // Directory that input files are stored
+const fileDirs = '/home/amirsorouri/Desktop/stream/amirh/semi'; // Directory that input files are stored
+const fileTmp = '/home/amirsorouri/Desktop/stream/amirh/semi/tmp'; // Directory that input files are stored
+const movieLocs = '/home/amirsorouri/Desktop/stream/amirh/semi/f2.mp4'; // Directory that input files are stored
 const readInterface = readline.createInterface({
     input: fs.createReadStream(fileDirs+'/keyFrameTimeList.txt'),
     console: true
@@ -59,30 +60,30 @@ amqp.connect('amqp://localhost', function(error0, connection) {
 
         console.log("Received '%s'", msg.content.toString());
         var head = Number(msg.content.toString());
-        console.log(head)
+        // console.log(head)
 
         var tmp = head + (head - 1)*2;
-        console.log(tmp)
+        console.log("Start From ", tmp)
         for (var i = 0; i < 3; i++, tmp++) {
             final = 'stream'.concat(tmp).concat('.ts');
-            console.log(final)
+            // console.log(final)
             if (fs.existsSync(fileDirs + '/' + final)) {
-                console.log('*** Another process doing it. ***');
+                console.log('*** Another process doing ', final + " ***");
                 continue;
             }
             if(mapStart.get(final) && mapEnd.get(final)) {
                 var proc = convert_segment_vod(mapStart.get(final), mapEnd.get(final), movieLocs, final, textVar);
-                try_to_watermark(proc, final).then(() => {
+                try_to_watermark(proc).then(() => {
+                  console.log("Inside try_to_watermark ", final);
                 // console.log("SUBPROCESS ", sgStartNo, ": ",final, " now exist.");
                 })
             }
             else {
-                console.log(final)
+                console.log(final, " is out of range.")
                 break;
             }
         }
-        console.log(head);
-
+        // console.log(head);
         setTimeout(function() {
             channel.ack(msg);
         }, 50);
@@ -121,11 +122,21 @@ function convert_segment_vod(mapStart, mapEnd, movieLocs, final, textVar){
       ])
       .on('end', function (stdout, stderr) {
         console.log('SUBPROCESS: Transcoding succeeded !', movieLocs, final);
+        fs.rename(fileTmp + '/'+ final, fileDirs + '/' + final, function (err) {
+          if (err) {
+              if (err.code === 'EXDEV') {
+                  console.log("Error 1")
+              } else {
+                console.log("Error 2")
+              }
+              return;
+          }
+        });
       })
       .on('error', function (err) {
         console.log('SUBPROCESS: an error happened: ' + err.message);
       })
-      .output(fileDirs+'/'+final)
+      .output(fileTmp+'/'+final)
       // .pipe(res)
       return proc;
 }

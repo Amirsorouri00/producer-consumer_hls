@@ -11,8 +11,8 @@ var app = express();
 var async = require("async")
 
 const textVar='amirsorouri00'
-const fileDirs = '/home/amirsorouri/Desktop/stream/amirh/node-queue/semi'; // Directory that input files are stored
-const movieLocs = '/home/amirsorouri/Desktop/stream/amirh/node-queue/semi/f2.mp4'; // Directory that input files are stored
+const fileDirs = '/home/amirsorouri/Desktop/stream/amirh/semi'; // Directory that input files are stored
+const movieLocs = '/home/amirsorouri/Desktop/stream/amirh/semi/f2.mp4'; // Directory that input files are stored
 
 const readInterface = readline.createInterface({
     input: fs.createReadStream(fileDirs+'/keyFrameTimeList.txt'),
@@ -52,10 +52,18 @@ const hls = new HLSServer(server, {
       var tmp = Number(rhhh);
 
       if (fs.existsSync(req.filePath)) {
-        console.log('yohooooooo file exists', req.filePath);
-        commit_future_ts(tmp+1);
-        // sleep.msleep(500);
-        callback(null, fs.createReadStream(req.filePath))
+        fs.open(req.filePath, 'r+', (err, fd) => {
+          if (err) {
+            console.log("Another process is working on ", final)
+          }
+          else{
+            console.log('yohooooooo file exists', req.filePath);
+            commit_future_ts(tmp+1);
+            // sleep.msleep(500);
+            callback(null, fs.createReadStream(req.filePath))
+          }
+          // writeMyData(fd);
+        });
       }
       else {
 
@@ -80,7 +88,8 @@ const hls = new HLSServer(server, {
 // }
 
 function commit_future_ts(tsNo) {
-  var tmp = tsNo + ((tsNo - 1) * 2);
+  // var tmp = tsNo + ((tsNo - 1) * 2);
+  var tmp = tsNo + 1;
     
   for(var i = 0; i < 3; i++, tmp++){
     return new Promise(resolve => {
