@@ -1,0 +1,172 @@
+<html>
+  <body>
+
+
+  	<h1> this is localhost page</h1>
+
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <video id="video" controls></video>
+    <br>
+    <button type="button" onclick="loadDoc()">set name</button>
+
+    <input id="textB" type="text" name="lname"><br>
+    <script>
+
+if (Hls.isSupported()) {
+            var video = document.getElementById("video");
+            var hls = new Hls({
+                debug: true,
+            });
+            hls.detachMedia();
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MEDIA_ATTACHED, function () {
+              hls.loadSource('http://localhost:8182/streams/stream.m3u8');
+              hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
+                    console.log("manifest loaded, found " + data.levels.length + " quality level");
+                    video.play();
+                });
+            });
+}
+  else   if(Hls.isSupported())
+    {
+      console.log('hls is suported');
+        var video = document.getElementById('video');
+
+      var config = {
+      autoStartLoad: true,
+      startPosition: -1,
+      debug: false,
+      capLevelOnFPSDrop: false,
+      capLevelToPlayerSize: false,
+      defaultAudioCodec: undefined,
+      initialLiveManifestSize: 1,
+      maxBufferLength: 30,
+      maxMaxBufferLength: 600,
+      maxBufferSize: 60*1000*1000,
+      maxBufferHole: 0.5,
+      lowBufferWatchdogPeriod: 0.5,
+      highBufferWatchdogPeriod: 3,
+      nudgeOffset: 0.1,
+      nudgeMaxRetry: 3,
+      maxFragLookUpTolerance: 0.25,
+      liveSyncDurationCount: 3,
+      liveMaxLatencyDurationCount: Infinity,
+      enableWorker: true,
+      enableSoftwareAES: true,
+      manifestLoadingTimeOut: 10000,
+      manifestLoadingMaxRetry: 1,
+      manifestLoadingRetryDelay: 1000,
+      manifestLoadingMaxRetryTimeout: 64000,
+      startLevel: undefined,
+      levelLoadingTimeOut: 10000,
+      levelLoadingMaxRetry: 4,
+      levelLoadingRetryDelay: 1000,
+      levelLoadingMaxRetryTimeout: 64000,
+      fragLoadingTimeOut: 20000,
+      fragLoadingMaxRetry: 6,
+      fragLoadingRetryDelay: 1000,
+      fragLoadingMaxRetryTimeout: 64000,
+      startFragPrefetch: false,
+      fpsDroppedMonitoringPeriod: 5000,
+      fpsDroppedMonitoringThreshold: 0.2,
+      appendErrorMaxRetry: 3,
+      loader: customLoader,
+      fLoader: customFragmentLoader,
+      pLoader: customPlaylistLoader,
+      xhrSetup: XMLHttpRequestSetupCallback,
+      fetchSetup: FetchSetupCallback,
+      abrController: AbrController,
+      bufferController: BufferController,
+      capLevelController: CapLevelController,
+      fpsController: FPSController,
+      timelineController: TimelineController,
+      enableWebVTT: true,
+      enableCEA708Captions: true,
+      stretchShortVideoTrack: false,
+      maxAudioFramesDrift: 1,
+      forceKeyFrameOnDiscontinuity: true,
+      abrEwmaFastLive: 3.0,
+      abrEwmaSlowLive: 9.0,
+      abrEwmaFastVoD: 3.0,
+      abrEwmaSlowVoD: 9.0,
+      abrEwmaDefaultEstimate: 500000,
+      abrBandWidthFactor: 0.95,
+      abrBandWidthUpFactor: 0.7,
+      abrMaxWithRealBitrate: false,
+      maxStarvationDelay: 4,
+      maxLoadingDelay: 4,
+      minAutoBitrate: 0,
+      emeEnabled: false,
+      widevineLicenseUrl: undefined,
+      requestMediaKeySystemAccessFunc: requestMediaKeySystemAccess
+  };
+
+  var hls = new Hls(config);
+
+
+
+        // var hls = new Hls();
+        hls.loadSource('http://localhost:8182/streams/stream.m3u8');
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED,function()
+        {
+          console.log('hls event ')
+          video.play();
+        });
+    }
+    else if (video.canPlayType('application/vnd.apple.mpegurl'))
+    {
+      console.log('hls isnot suported');
+
+        video.src = 'http://localhost:8182/streams/stream.m3u8';
+        video.addEventListener('canplay',function()
+        {
+            video.play();
+        });
+    }
+
+
+    /* attach a submit handler to the form */
+    function loadDoc() {
+  var xhttp = new XMLHttpRequest();
+ 
+  xhttp.open("GET", 'http://localhost:8182/streams/setname.'.concat(document.getElementById("textB").value), true);
+  xhttp.send();
+}
+    </script>
+  </body>
+</html>
+
+
+
+<!-- 
+<html>
+<head><title>Debug Player</title></head>
+  <body>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <video controls id="video"></video>
+  <br>
+  <input type="text" />
+  <button id="load">Load</button>
+  <script>
+    if(Hls.isSupported()) {
+      var video = document.getElementById('video');
+      var hls = new Hls();
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED,function() {
+        video.play();
+      });
+      document.querySelector("#load").addEventListener("click", function () {
+        hls.loadSource(document.querySelector("input").value);
+      })
+   } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.addEventListener('canplay',function() {
+        video.play();
+      });
+      document.querySelector("#load").addEventListener("click", function () {
+        video.src = document.querySelector("input").value;
+      })
+    }
+  </script>
+  </body>
+</html>` -->
