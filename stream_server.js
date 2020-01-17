@@ -11,8 +11,8 @@ var app = express();
 var async = require("async")
 
 const textVar='amirsorouri00'
-const fileDirs = '/home/amirsorouri/Desktop/stream/amirh/semi'; // Directory that input files are stored
-const movieLocs = '/home/amirsorouri/Desktop/stream/amirh/semi/f2.mp4'; // Directory that input files are stored
+const fileDirs = '/home/amirsorouri/Desktop/stream/amirh/friends'; // Directory that input files are stored
+const movieLocs = '/home/amirsorouri/Desktop/stream/amirh/friends/f2.mp4'; // Directory that input files are stored
 
 const readInterface = readline.createInterface({
     input: fs.createReadStream(fileDirs+'/keyFrameTimeList.txt'),
@@ -91,13 +91,13 @@ function commit_future_ts(tsNo) {
   // var tmp = tsNo + ((tsNo - 1) * 2);
   var tmp = tsNo + 1;
     
-  for(var i = 0; i < 3; i++, tmp++){
+  // for(var i = 0; i < 3; i++, tmp++){
     return new Promise(resolve => {
       setTimeout(() => {
         resolve(push_message(tmp));
       }, 2000);
     });
-  }
+  // }
 }
 
 
@@ -125,14 +125,8 @@ function push_message(message) {
             persistent: true
             });
             console.log("Sent '%s'", msg);
-            // connection.close();
             return 1
         });
-        // setTimeout(function() {
-        //     connection.close();
-        //     return 1
-        //     // process.exit(0)
-        // }, 500);
     });
   }catch(e){
     console.log(e)

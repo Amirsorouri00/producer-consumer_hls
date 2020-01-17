@@ -7,9 +7,9 @@ const amqp = require('amqplib/callback_api');
 var app = express();
 
 const textVar='amirsorouri00'
-const fileDirs = '/home/amirsorouri/Desktop/stream/amirh/semi'; // Directory that input files are stored
-const fileTmp = '/home/amirsorouri/Desktop/stream/amirh/semi/tmp'; // Directory that input files are stored
-const movieLocs = '/home/amirsorouri/Desktop/stream/amirh/semi/f2.mp4'; // Directory that input files are stored
+const fileDirs = '/home/amirsorouri/Desktop/stream/amirh/friends'; // Directory that input files are stored
+const fileTmp = '/home/amirsorouri/Desktop/stream/amirh/friends/tmp'; // Directory that input files are stored
+const movieLocs = '/home/amirsorouri/Desktop/stream/amirh/friends/f2.mp4'; // Directory that input files are stored
 const readInterface = readline.createInterface({
     input: fs.createReadStream(fileDirs+'/keyFrameTimeList.txt'),
     console: true
@@ -63,24 +63,28 @@ amqp.connect('amqp://localhost', function(error0, connection) {
         // console.log(head)
 
         var tmp = head + (head - 1)*2;
+        // var tmp = head;
         console.log("Start From ", tmp)
         for (var i = 0; i < 3; i++, tmp++) {
             final = 'stream'.concat(tmp).concat('.ts');
             // console.log(final)
             if (fs.existsSync(fileDirs + '/' + final)) {
                 console.log('*** Another process doing ', final + " ***");
-                continue;
+                // continue;
             }
             if(mapStart.get(final) && mapEnd.get(final)) {
-                var proc = convert_segment_vod(mapStart.get(final), mapEnd.get(final), movieLocs, final, textVar);
-                try_to_watermark(proc).then(() => {
-                  console.log("Inside try_to_watermark ", final);
-                // console.log("SUBPROCESS ", sgStartNo, ": ",final, " now exist.");
-                })
+              convert_segment_vod(mapStart.get(final), mapEnd.get(final), movieLocs, final, textVar).then(() =>{
+                console.log("hello");
+              });
+                // var proc = convert_segment_vod(mapStart.get(final), mapEnd.get(final), movieLocs, final, textVar);
+                // watermarker(proc).then(() => {
+                //   // console.log("Inside try_to_watermark ", final);
+                // // console.log("SUBPROCESS ", sgStartNo, ": ",final, " now exist.");
+                // })
             }
             else {
                 console.log(final, " is out of range.")
-                break;
+                // break;
             }
         }
         // console.log(head);
@@ -137,6 +141,12 @@ function convert_segment_vod(mapStart, mapEnd, movieLocs, final, textVar){
         console.log('SUBPROCESS: an error happened: ' + err.message);
       })
       .output(fileTmp+'/'+final)
+
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve(proc.run());
+        }, 2000);
+      });
       // .pipe(res)
-      return proc;
+      // return proc;
 }
